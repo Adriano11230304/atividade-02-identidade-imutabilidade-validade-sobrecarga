@@ -14,9 +14,143 @@ _Classroom link:_ <https://classroom.github.com/a/Ti-_ZVrw>
 - sobrecarga
 - validade (exceptions)
 
-#### Prazo: 2019-04-14 Peso: 1.2 pts
+#### Prazo: 2019-04-21 Peso: 1.2 pts
 
 **Restrição: não podem ser usadas as bibliotecas do Java, por exemplo, a classe `Math`, `Scanner`, etc, inclusive os métodos de Integer, como `parseInt` ou métodos de String, EXCETO `length`, `charAt` e `equals`; Os Casos de Teste podem ser corrigidos, mas a especificação não pode ser alterada.**
+
+### Implementar o objeto `Coord` (0.5 pts, substitui `Time`)
+
+Instâncias de `Coord` devem representar uma posição geográfica no formato de _latitude_ e _longitude_ em graus decimais, sendo que a _latitude_ vai de `-90.0` a `+90.0` e a _longitude_ de `-180.0` a `+180.0`. A construção sem argumentos de uma coordenada deve instanciar _latitude_ `0` e _longitude_ `0`. Após a construção não devem ser permitidas alterações na _latitude_ e _longitude_ a não ser que outra instância seja construída, em outras palavras, os objetos devem ser **imutáveis**.
+
+Considere os Casos de Teste:
+```java
+// construtores:
+Coord c1 = new Coord();
+System.out.println(c1.getLat() == 0.0);
+System.out.println(c1.getLong() == 0.0);
+
+Coord c2 = new Coord(50.0, 134.0);
+System.out.println(c2.getLat() == 50.0);
+System.out.println(c2.getLong() == 134.0);
+
+Coord c3 = new Coord(-90.0, -180.0);
+System.out.println(c3.getLat() == -90.0);
+System.out.println(c3.getLong() == -180.0);
+
+// estas coordenadas são inválidas e devem lançar exceção
+// faça serem rejeitadas e depois comente-as para não parar o programa
+Coord e1 = new Coord(-91.0, 0.0);
+Coord e2 = new Coord(100.0, 0.0);
+Coord e3 = new Coord(10.0, -182.0);
+Coord e4 = new Coord(10.0, 200.0);
+Coord e5 = new Coord(-95.0, -200.0);
+
+// imutabilidade: as linhas a seguir devem causar erro de compilação
+// verifique se está de acordo e depois comente-as
+Coord c4 = new Coord();
+c4.getLat() = 30.0;  // não deve permitir reatribuição
+c4.getLong() = 80.0; // não deve permitir reatribuição
+
+// operações/comandos:
+Coord in = new Coord(30.0, 50.0);
+Coord out = in.moveNorth(5.0); // deslocamento
+System.out.println(in.getLat() == 30.0); // deve ser imutável
+System.out.println(out.getLat() == 35.0);
+out.moveNorth(5.0); // sem reatribuição sem alteração
+System.out.println(out.getLat() == 35.0);
+out = out.moveNorth(5.0); // reatribuindo
+System.out.println(out.getLat() == 40.0);
+out = out.moveSouth(60.0);
+System.out.println(out.getLat() == -20.0);
+out = out.moveSouth(30.0);
+System.out.println(out.getLat() == -50.0);
+out = out.moveSouth(-10.0);
+System.out.println(out.getLat() == -40.0);
+out = out.moveNorth(-10.0);
+System.out.println(out.getLat() == -50.0);
+System.out.println(out.getLong() == 50.0);
+out = out.moveEast(50.0);
+System.out.println(out.getLong() == 100.0);
+out = out.moveWest(180.0);
+System.out.println(out.getLong() == -80.0);
+out = out.moveWest(-10.0);
+System.out.println(out.getLong() == -70.0);
+out = out.moveEast(-10.0);
+System.out.println(out.getLong() == -80.0);
+// até aqui 0.2
+
+// consultas:
+Coord q = new Coord();
+System.out.println(q.getLat() == 0);
+System.out.println(q.getLong() == 0);
+System.out.println(q.isEquatorLine() == true);
+System.out.println(q.isMeridianLine() == true);
+q = q.moveNorth(10.0);
+System.out.println(q.getLat() == 10);
+System.out.println(q.isEquatorLine() == false);
+q = q.moveEast(10.0);
+System.out.println(q.isMeridianLine() == false);
+q = q.moveEast(170.0);
+System.out.println(q.getLong() == 180.0);
+System.out.println(q.isMeridianLine() == true);
+q = q.moveWest(200.0);
+System.out.println(q.getLong() == -20.0);
+System.out.println(q.isMeridianLine() == false);
+q = q.moveWest(160.0);
+System.out.println(q.getLong() == -180.0);
+System.out.println(q.isMeridianLine() == true);
+
+Coord r = new Coord(30.0, 70.0);
+System.out.println(r.getLat() == 30.0);
+System.out.println(r.getLong() == 70.0);
+System.out.println(r.isNorth() == true);
+System.out.println(r.isSouth() == false);
+System.out.println(r.isOrient() == true);
+System.out.println(r.isOcident() == false);
+r = r.moveWest(140.0).moveSouth(60.0);
+System.out.println(r.getLat() == -30.0);
+System.out.println(r.getLong() == -70.0);
+System.out.println(r.isNorth() == false);
+System.out.println(r.isSouth() == true);
+System.out.println(r.isOrient() == false);
+System.out.println(r.isOcident() == true);
+
+// toString:
+System.out.println(c1.toString().equals("0.0°, 0.0°"));
+System.out.println(c2.toString().equals("50.0°, 134.0°"));
+System.out.println(c3.toString().equals("-90.0°, -180.0°"));
+System.out.println(out.toString().equals("-50.0°, -80.0°"));
+System.out.println(q.toString().equals("10.0°, -180.0°"));
+System.out.println(r); // -30.0°, -70.0°
+System.out.println(r.toString().equals("-30.0°, -70.0°"));
+
+Coord t = new Coord(-32.0714021, -52.1425059);
+// https://www.google.com.br/maps/@-32.0714021,-52.1425059,13z?hl=pt-BR
+System.out.println(t);; // -32.0714021°, -52.1425059°
+System.out.println(t.toString().equals("-32.0714021°, -52.1425059°"));
+
+// equals:
+System.out.println(t.equals(r) == false);
+Coord y = new Coord(-32.0714021, -52.1425059);
+System.out.println(t.equals(y) == true);
+System.out.println(y.equals(t) == true);
+System.out.println(y.equals(y) == true);
+System.out.println(y.equals(r) == false);
+
+// desafio: escrever método que retorna link para Google Maps!
+Coord t = new Coord(37.402473, -122.3212843);
+String url = t.getGoogleMapsURL();
+System.out.println(url.equals("https://www.google.com.br/maps/@37.402473,-122.3212843,10z?hl=pt-BR"));
+// descomente para ver se funciona (não testei)
+// Runtime.getRuntime().exec("google-chrome " + url);
+// tente outro navegador, no windows tente "start " + url
+```
+
+**Informações adicionais:**
+
+- Imagem esclarecedora <http://eogn.com/images/newsletter/2014/Latitude-and-longitude.png>
+- Sobre coordenadas decimais <http://opussig.blogspot.com.br/2013/01/coordenadas-geograficas-em-formato.html>
+- Sessão _remember_ <http://brasilescola.uol.com.br/geografia/coordenadas-geograficas.htm>
 
 ### Implementar uma classe para gerar objetos imutáveis de Tempo e suas operações (0.5 pts)
 
@@ -90,10 +224,10 @@ System.out.println(t20.toString().equals("quanto vale t20? escreva aqui"));
 Time esp = new Time(-1, 40, 5); // 24 - 1
 System.out.println(esp); // 23:40:05
 System.out.println(esp.toString().equals("23:40:05"));
-esp = new Time(12, -15, -5); // 60 - 15, 60 - 5
-System.out.println(esp.toString().equals("12:45:55"));
+esp = new Time(12, -15, -5);
+System.out.println(esp.toString().equals("11:44:55"));
 esp = new Time(25, 70, 70);
-System.out.println(esp.toString().equals("06:11:10"));
+System.out.println(esp.toString().equals("02:11:10"));
 esp = new Time(-28, 10, 20); // 24 - 28 = -4, 24 - 4
 System.out.println(esp.toString().equals("20:10:20"));
 // até aqui 0.5
